@@ -1,0 +1,2 @@
+string connectionString = "Server=VKT-A5K962K17062025\\SQLEXPRESS;Database=TrenDemExDemoLisk;User ID=saliski;Password=*********;";
+
