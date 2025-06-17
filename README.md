@@ -1,0 +1,2 @@
+# TrenDemExDemoLisk17062025VSCodeComynSSMS1901817v
+DESKTOP-A5K962K\SQLEXPRESSUULiski-ЛысенкоКолледж
