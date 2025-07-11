@@ -1,0 +1,12 @@
+История изменений и бэкапов (Copilot, 11.07.2025)
+
+Всё содержимое проекта, включая:
+- vk-testers/ezstatvk-testers.html (автономный сайт с капчей, пуш-уведомлениями, кнопкой VK)
+- index.html (для GitHub Pages)
+- it-pages/* (структура и примеры страниц по IT)
+- PROJECT_PRESENTATION.md (презентация)
+- SESSION_HISTORY_COPILOT.txt (история диалога)
+
+Все изменения и автоматизация выполнены с помощью GitHub Copilot.
+
+Спасибо за сотрудничество!
