@@ -2,9 +2,105 @@
 <html>
 <head>
     <meta charset="UTF-8" />
-    <title>Welcom   VKTNDA</title>
+    <title>Welcome VKTNDA</title>
+    <style>
+        body {
+            background: #222831;
+            color: #eeeeee;
+            font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-container {
+            background: #23272e;
+            border-radius: 10px;
+            box-shadow: 0 0 20px #000a;
+            padding: 2rem 2.5rem;
+            width: 350px;
+        }
+        h2 {
+            color: #00e1ff;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #00e1ff;
+        }
+        input[type="text"], input[type="tel"] {
+            width: 100%;
+            padding: 0.7rem;
+            margin-bottom: 1rem;
+            border: none;
+            border-radius: 5px;
+            background: #393e46;
+            color: #fff;
+            font-size: 1rem;
+        }
+        button {
+            width: 100%;
+            padding: 0.7rem;
+            background: #00e1ff;
+            color: #23272e;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #00b8d4;
+        }
+        .hidden { display: none; }
+        .success { color: #00ff99; text-align: center; margin-top: 1rem; }
+        .error { color: #ff3c3c; text-align: center; margin-top: 1rem; }
+    </style>
 </head>
 <body>
-    
+    <div class="auth-container">
+        <h2>Вход</h2>
+        <form id="phone-form">
+            <label for="phone">Телефон:</label>
+            <input type="tel" id="phone" name="phone" placeholder="+7XXXXXXXXXX" required pattern="\\+7\\d{10}">
+            <button type="submit">Получить код</button>
+        </form>
+        <form id="code-form" class="hidden">
+            <label for="code">Код из SMS:</label>
+            <input type="text" id="code" name="code" maxlength="6" required pattern="\\d{4,6}">
+            <button type="submit">Войти</button>
+        </form>
+        <div id="message"></div>
+    </div>
+    <script>
+        const phoneForm = document.getElementById('phone-form');
+        const codeForm = document.getElementById('code-form');
+        const message = document.getElementById('message');
+        let sentCode = '';
+
+        phoneForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Генерируем фейковый код (например, 1234)
+            sentCode = '1234';
+            phoneForm.classList.add('hidden');
+            codeForm.classList.remove('hidden');
+            message.innerHTML = '<span class="success">Код отправлен! (Для теста: 1234)</span>';
+        });
+
+        codeForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const userCode = document.getElementById('code').value;
+            if (userCode === sentCode) {
+                message.innerHTML = '<span class="success">Успешная авторизация!</span>';
+                codeForm.classList.add('hidden');
+            } else {
+                message.innerHTML = '<span class="error">Неверный код. Попробуйте ещё раз.</span>';
+            }
+        });
+    </script>
 </body>
 </html>
