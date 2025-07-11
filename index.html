@@ -3,10 +3,178 @@
 <head>
     <meta charset="UTF-8" />
     <title>Welcome VKTNDA</title>
-    <!-- ...existing code... -->
+    <style>
+        body {
+            background: #222831;
+            color: #eeeeee;
+            font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: #23272e;
+            border-radius: 10px;
+            box-shadow: 0 0 20px #000a;
+            padding: 2rem 2.5rem;
+            width: 350px;
+        }
+        h2 {
+            color: #00e1ff;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #00e1ff;
+        }
+        input[type="text"], input[type="tel"], textarea {
+            width: 100%;
+            padding: 0.7rem;
+            margin-bottom: 1rem;
+            border: none;
+            border-radius: 5px;
+            background: #393e46;
+            color: #fff;
+            font-size: 1rem;
+        }
+        button {
+            width: 100%;
+            padding: 0.7rem;
+            background: #00e1ff;
+            color: #23272e;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #00b8d4;
+        }
+        .hidden { display: none; }
+        .success { color: #00ff99; text-align: center; margin-top: 1rem; }
+        .error { color: #ff3c3c; text-align: center; margin-top: 1rem; }
+        .edit-label { color: #00ff99; margin-bottom: 0.5rem; }
+    </style>
 </head>
 <body>
-    <!-- ...existing code... -->
+    <div class="container">
+        <h2>Открытый сайт</h2>
+        <div id="public-content">
+            <p>Добро пожаловать! Этот сайт открыт для всех пользователей.</p>
+        </div>
+        <button id="edit-btn">Войти для редактирования</button>
+        <button id="vk-btn" style="margin-bottom:1rem;background:#2787f5;color:#fff;">Открыть сайт ВКонтакте</button>
+        <form id="captcha-form" class="hidden">
+            <label class="edit-label">Подтвердите, что вы не робот:</label>
+            <div style="margin-bottom:1rem;">
+                <input type="checkbox" id="not-robot"> Я не робот
+            </div>
+            <label for="captcha-answer">Сколько будет 3 + 4?</label>
+            <input type="text" id="captcha-answer" name="captcha-answer" required pattern="7">
+            <button type="submit">Войти</button>
+        </form>
+        <form id="edit-form" class="hidden">
+            <label class="edit-label" for="edit-area">Редактирование контента:</label>
+            <textarea id="edit-area" rows="5"></textarea>
+            <button type="submit">Сохранить</button>
+        </form>
+        <div id="message"></div>
+    </div>
+    <script>
+        const editBtn = document.getElementById('edit-btn');
+        const captchaForm = document.getElementById('captcha-form');
+        const editForm = document.getElementById('edit-form');
+        const message = document.getElementById('message');
+        const publicContent = document.getElementById('public-content');
+        const editArea = document.getElementById('edit-area');
+        let isAuthorized = false;
+
+        // Показать форму капчи
+        editBtn.addEventListener('click', function() {
+            editBtn.classList.add('hidden');
+            captchaForm.classList.remove('hidden');
+        });
+
+        // Проверка капчи
+        captchaForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const notRobot = document.getElementById('not-robot').checked;
+            const answer = document.getElementById('captcha-answer').value.trim();
+            if (notRobot && answer === '7') {
+                isAuthorized = true;
+                message.innerHTML = '<span class="success">Доступ к редактированию открыт!</span>';
+                captchaForm.classList.add('hidden');
+                editForm.classList.remove('hidden');
+                editArea.value = publicContent.innerHTML;
+                // Пуш-уведомление
+                if (window.Notification && Notification.permission !== "denied") {
+                    Notification.requestPermission().then(function(permission) {
+                        if (permission === "granted") {
+                            new Notification("Вход выполнен!", { body: "Доступ к редактированию открыт." });
+                        }
+                    });
+                }
+            } else {
+                message.innerHTML = '<span class="error">Подтвердите, что вы не робот, и правильно ответьте на вопрос.</span>';
+            }
+        });
+
+        // Сохранить изменения
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (isAuthorized) {
+                publicContent.innerHTML = editArea.value;
+                message.innerHTML = '<span class="success">Контент обновлён!</span>';
+            }
+        });
+
+        // Пуш-уведомление с точным временем для Воронежской области (UTC+3)
+        function sendVoronezhTimeNotification() {
+            const now = new Date();
+            // UTC+3 для Воронежа
+            const voronezhTime = new Date(now.getTime() + (3 - now.getTimezoneOffset() / 60) * 60 * 60 * 1000);
+            const hours = voronezhTime.getUTCHours().toString().padStart(2, '0');
+            const minutes = voronezhTime.getUTCMinutes().toString().padStart(2, '0');
+            const seconds = voronezhTime.getUTCSeconds().toString().padStart(2, '0');
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            new Notification("Время в Воронежской области", { body: `Сейчас ${timeString}` });
+        }
+
+        // Запросить разрешение и запускать пуш-уведомления каждый час
+        function startVoronezhTimePushes() {
+            if (window.Notification && Notification.permission !== "denied") {
+                Notification.requestPermission().then(function(permission) {
+                    if (permission === "granted") {
+                        sendVoronezhTimeNotification();
+                        setInterval(sendVoronezhTimeNotification, 60 * 60 * 1000); // каждый час
+                    }
+                });
+            }
+        }
+
+        // Предложить посетителю включить пуш-уведомления времени
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (window.Notification && Notification.permission !== "granted") {
+                    if (confirm('Хотите получать пуш-уведомления с точным временем для Воронежской области каждый час?')) {
+                        startVoronezhTimePushes();
+                    }
+                } else if (window.Notification && Notification.permission === "granted") {
+                    startVoronezhTimePushes();
+                }
+            }, 2000);
+        });
+
+        document.getElementById('vk-btn').onclick = function() {
+            window.open('https://vk.com', '_blank');
+        };
+    </script>
 </body>
 </html>
 
