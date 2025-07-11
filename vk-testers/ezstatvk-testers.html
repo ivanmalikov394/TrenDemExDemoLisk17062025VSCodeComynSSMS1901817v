@@ -14,7 +14,7 @@
             align-items: center;
             justify-content: center;
         }
-        .auth-container {
+        .container {
             background: #23272e;
             border-radius: 10px;
             box-shadow: 0 0 20px #000a;
@@ -31,7 +31,7 @@
             margin-bottom: 0.5rem;
             color: #00e1ff;
         }
-        input[type="text"], input[type="tel"] {
+        input[type="text"], input[type="tel"], textarea {
             width: 100%;
             padding: 0.7rem;
             margin-bottom: 1rem;
@@ -59,48 +59,80 @@
         .hidden { display: none; }
         .success { color: #00ff99; text-align: center; margin-top: 1rem; }
         .error { color: #ff3c3c; text-align: center; margin-top: 1rem; }
+        .edit-label { color: #00ff99; margin-bottom: 0.5rem; }
     </style>
 </head>
 <body>
-    <div class="auth-container">
-        <h2>Вход</h2>
-        <form id="phone-form">
-            <label for="phone">Телефон:</label>
-            <input type="tel" id="phone" name="phone" placeholder="+7XXXXXXXXXX" required pattern="\\+7\\d{10}">
-            <button type="submit">Получить код</button>
-        </form>
-        <form id="code-form" class="hidden">
-            <label for="code">Код из SMS:</label>
-            <input type="text" id="code" name="code" maxlength="6" required pattern="\\d{4,6}">
+    <div class="container">
+        <h2>Открытый сайт</h2>
+        <div id="public-content">
+            <p>Добро пожаловать! Этот сайт открыт для всех пользователей.</p>
+        </div>
+        <button id="edit-btn">Войти для редактирования</button>
+        <form id="captcha-form" class="hidden">
+            <label class="edit-label">Подтвердите, что вы не робот:</label>
+            <div style="margin-bottom:1rem;">
+                <input type="checkbox" id="not-robot"> Я не робот
+            </div>
+            <label for="captcha-answer">Сколько будет 3 + 4?</label>
+            <input type="text" id="captcha-answer" name="captcha-answer" required pattern="7">
             <button type="submit">Войти</button>
+        </form>
+        <form id="edit-form" class="hidden">
+            <label class="edit-label" for="edit-area">Редактирование контента:</label>
+            <textarea id="edit-area" rows="5"></textarea>
+            <button type="submit">Сохранить</button>
         </form>
         <div id="message"></div>
     </div>
     <script>
-        const phoneForm = document.getElementById('phone-form');
-        const codeForm = document.getElementById('code-form');
+        const editBtn = document.getElementById('edit-btn');
+        const captchaForm = document.getElementById('captcha-form');
+        const editForm = document.getElementById('edit-form');
         const message = document.getElementById('message');
-        let sentCode = '';
+        const publicContent = document.getElementById('public-content');
+        const editArea = document.getElementById('edit-area');
+        let isAuthorized = false;
 
-        phoneForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            // Генерируем фейковый код (например, 1234)
-            sentCode = '1234';
-            phoneForm.classList.add('hidden');
-            codeForm.classList.remove('hidden');
-            message.innerHTML = '<span class="success">Код отправлен! (Для теста: 1234)</span>';
+        // Показать форму капчи
+        editBtn.addEventListener('click', function() {
+            editBtn.classList.add('hidden');
+            captchaForm.classList.remove('hidden');
         });
 
-        codeForm.addEventListener('submit', function(e) {
+        // Проверка капчи
+        captchaForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const userCode = document.getElementById('code').value;
-            if (userCode === sentCode) {
-                message.innerHTML = '<span class="success">Успешная авторизация!</span>';
-                codeForm.classList.add('hidden');
+            const notRobot = document.getElementById('not-robot').checked;
+            const answer = document.getElementById('captcha-answer').value.trim();
+            if (notRobot && answer === '7') {
+                isAuthorized = true;
+                message.innerHTML = '<span class="success">Доступ к редактированию открыт!</span>';
+                captchaForm.classList.add('hidden');
+                editForm.classList.remove('hidden');
+                editArea.value = publicContent.innerHTML;
+                // Пуш-уведомление
+                if (window.Notification && Notification.permission !== "denied") {
+                    Notification.requestPermission().then(function(permission) {
+                        if (permission === "granted") {
+                            new Notification("Вход выполнен!", { body: "Доступ к редактированию открыт." });
+                        }
+                    });
+                }
             } else {
-                message.innerHTML = '<span class="error">Неверный код. Попробуйте ещё раз.</span>';
+                message.innerHTML = '<span class="error">Подтвердите, что вы не робот, и правильно ответьте на вопрос.</span>';
+            }
+        });
+
+        // Сохранить изменения
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (isAuthorized) {
+                publicContent.innerHTML = editArea.value;
+                message.innerHTML = '<span class="success">Контент обновлён!</span>';
             }
         });
     </script>
 </body>
 </html>
+// <!-- --- IGNORE иванников илья владимирович 89009627198--- -->
