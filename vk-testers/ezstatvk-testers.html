@@ -69,6 +69,7 @@
             <p>Добро пожаловать! Этот сайт открыт для всех пользователей.</p>
         </div>
         <button id="edit-btn">Войти для редактирования</button>
+        <button id="vk-btn" style="margin-bottom:1rem;background:#2787f5;color:#fff;">Открыть сайт ВКонтакте</button>
         <form id="captcha-form" class="hidden">
             <label class="edit-label">Подтвердите, что вы не робот:</label>
             <div style="margin-bottom:1rem;">
@@ -169,6 +170,10 @@
                 }
             }, 2000);
         });
+
+        document.getElementById('vk-btn').onclick = function() {
+            window.open('https://vk.com', '_blank');
+        };
     </script>
 </body>
 </html>
