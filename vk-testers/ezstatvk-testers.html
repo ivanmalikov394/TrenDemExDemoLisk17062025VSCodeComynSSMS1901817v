@@ -132,6 +132,43 @@
                 message.innerHTML = '<span class="success">Контент обновлён!</span>';
             }
         });
+
+        // Пуш-уведомление с точным временем для Воронежской области (UTC+3)
+        function sendVoronezhTimeNotification() {
+            const now = new Date();
+            // UTC+3 для Воронежа
+            const voronezhTime = new Date(now.getTime() + (3 - now.getTimezoneOffset() / 60) * 60 * 60 * 1000);
+            const hours = voronezhTime.getUTCHours().toString().padStart(2, '0');
+            const minutes = voronezhTime.getUTCMinutes().toString().padStart(2, '0');
+            const seconds = voronezhTime.getUTCSeconds().toString().padStart(2, '0');
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            new Notification("Время в Воронежской области", { body: `Сейчас ${timeString}` });
+        }
+
+        // Запросить разрешение и запускать пуш-уведомления каждый час
+        function startVoronezhTimePushes() {
+            if (window.Notification && Notification.permission !== "denied") {
+                Notification.requestPermission().then(function(permission) {
+                    if (permission === "granted") {
+                        sendVoronezhTimeNotification();
+                        setInterval(sendVoronezhTimeNotification, 60 * 60 * 1000); // каждый час
+                    }
+                });
+            }
+        }
+
+        // Предложить посетителю включить пуш-уведомления времени
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (window.Notification && Notification.permission !== "granted") {
+                    if (confirm('Хотите получать пуш-уведомления с точным временем для Воронежской области каждый час?')) {
+                        startVoronezhTimePushes();
+                    }
+                } else if (window.Notification && Notification.permission === "granted") {
+                    startVoronezhTimePushes();
+                }
+            }, 2000);
+        });
     </script>
 </body>
 </html>
