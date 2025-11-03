@@ -1,88 +1,182 @@
-
-<!doctype html>
-<!--[if IE]><![endif]-->
-<html lang="ru">
+<!DOCTYPE html>
+<html>
 <head>
-	<meta charset="utf-8"/>
-	<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
-	<meta name="viewport" content="viewport-fit=cover,width=device-width,initial-scale=1.0,user-scalable=no"/>
-	<meta name="theme-color" content="#ffffff" />
-	<meta name="format-detection" content="telephone=no"/>
-	<meta name="apple-itunes-app" content="app-id=604761759"/>
-	<link rel="manifest" href="/static/manifest.json" crossorigin="use-credentials"/>
-	
-	<title>Контур.Фокус &ndash; веб-сервис для быстрой проверки контрагентов</title>
-
-	
-	<meta name="apple-mobile-web-app-title" content="Фокус"/>
-	
-
-	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
-	<link rel="icon" type="image/png" href="/static/icons/favicon-16x16.png" sizes="16x16">
-	<link rel="icon" type="image/png" href="/static/icons/favicon-32x32.png" sizes="32x32">
-
-	
-	<link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
-	<link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
-	<link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
-	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
-	<link rel="mask-icon" href="/static/icons/focus-icon.svg">
-
-	<meta name="msapplication-TileColor" content="#4D9068">
-	<meta name="msapplication-TileImage" content="/static/icons/mstile-144x144.png">
-
-	<link href="/static/styles.ec62d81e2073b282.css" rel="stylesheet" type="text/css"/>
-	<link media="print" href="/static/styles.print.87d6df75e20d112a.css" rel="stylesheet" type="text/css"/>
-
-	<link rel="stylesheet" href="/static/react/styles.6cfd8c45c6bdb0132ec5.css" type="text/css"/>
-	<link rel="stylesheet" href="/static/assets/LabGrotesqueK.css" type="text/css"/>
-
-	<script src="/static/scripts/libs/jquery-2.2.4.min.js"></script>
-	<script src="/static/scripts/libs/jquery-plugins-fcb2f435b8899004.min.js" type="text/javascript"></script>
-	<script src="/static/scripts/libs/vanilla-0f999143a4f4af5d.min.js" type="text/javascript"></script>
-	<script src="/static/scripts/libs/underscore-1.6.0.min.js" type="text/javascript"></script>
-	<script src="https://forms.kontur.ru/widget/loader" async defer></script>
-
-	
-	<script src="/static/scripts.deb1db23c396158b.js" type="text/javascript"></script>
-
-	
-
-	
-	
+    <meta charset="UTF-8" />
+    <title>Welcome VKTNDA</title>
+    <style>
+        body {
+            background: #222831;
+            color: #eeeeee;
+            font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: #23272e;
+            border-radius: 10px;
+            box-shadow: 0 0 20px #000a;
+            padding: 2rem 2.5rem;
+            width: 350px;
+        }
+        h2 {
+            color: #00e1ff;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #00e1ff;
+        }
+        input[type="text"], input[type="tel"], textarea {
+            width: 100%;
+            padding: 0.7rem;
+            margin-bottom: 1rem;
+            border: none;
+            border-radius: 5px;
+            background: #393e46;
+            color: #fff;
+            font-size: 1rem;
+        }
+        button {
+            width: 100%;
+            padding: 0.7rem;
+            background: #00e1ff;
+            color: #23272e;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #00b8d4;
+        }
+        .hidden { display: none; }
+        .success { color: #00ff99; text-align: center; margin-top: 1rem; }
+        .error { color: #ff3c3c; text-align: center; margin-top: 1rem; }
+        .edit-label { color: #00ff99; margin-bottom: 0.5rem; }
+    </style>
 </head>
-<body class="   ">
-	
-	<div id="MainPage"></div>
+<body>
+    <div class="container">
+        <h2>Открытый сайт</h2>
+        <div id="public-content">
+            <p>Добро пожаловать! Этот сайт открыт для всех пользователей.</p>
+        </div>
+        <button id="edit-btn">Войти для редактирования</button>
+        <button id="vk-btn" style="margin-bottom:1rem;background:#2787f5;color:#fff;">Открыть сайт ВКонтакте</button>
+        <form id="captcha-form" class="hidden">
+            <label class="edit-label">Подтвердите, что вы не робот:</label>
+            <div style="margin-bottom:1rem;">
+                <input type="checkbox" id="not-robot"> Я не робот
+            </div>
+            <label for="captcha-answer">Сколько будет 3 + 4?</label>
+            <input type="text" id="captcha-answer" name="captcha-answer" required pattern="7">
+            <button type="submit">Войти</button>
+        </form>
+        <form id="edit-form" class="hidden">
+            <label class="edit-label" for="edit-area">Редактирование контента:</label>
+            <textarea id="edit-area" rows="5"></textarea>
+            <button type="submit">Сохранить</button>
+        </form>
+        <div id="message"></div>
+    </div>
+    <script>
+        const editBtn = document.getElementById('edit-btn');
+        const captchaForm = document.getElementById('captcha-form');
+        const editForm = document.getElementById('edit-form');
+        const message = document.getElementById('message');
+        const publicContent = document.getElementById('public-content');
+        const editArea = document.getElementById('edit-area');
+        let isAuthorized = false;
 
-	
-	
-	
-		<script type="application/json" id="focusWebAppSettings">{"abTestingInProgress":false,"disableGTM":false,"disableYaMetric":false,"tracesSampleRateSentry":0.1,"tryDemoLink":"https:\/\/focus.kontur.ru\/demo?from=focus"}</script>
-	
-	<div class="frame">
-		<!--noindex--><div class="only-print print-head">Контур.Фокус &#169; АО &#171;ПФ &#171;СКБ Контур&#187;&nbsp;2025</div><!--/noindex-->
-		
+        // Показать форму капчи
+        editBtn.addEventListener('click', function() {
+            editBtn.classList.add('hidden');
+            captchaForm.classList.remove('hidden');
+        });
 
+        // Проверка капчи
+        captchaForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const notRobot = document.getElementById('not-robot').checked;
+            const answer = document.getElementById('captcha-answer').value.trim();
+            if (notRobot && answer === '7') {
+                isAuthorized = true;
+                message.innerHTML = '<span class="success">Доступ к редактированию открыт!</span>';
+                captchaForm.classList.add('hidden');
+                editForm.classList.remove('hidden');
+                editArea.value = publicContent.innerHTML;
+                // Пуш-уведомление
+                if (window.Notification && Notification.permission !== "denied") {
+                    Notification.requestPermission().then(function(permission) {
+                        if (permission === "granted") {
+                            new Notification("Вход выполнен!", { body: "Доступ к редактированию открыт." });
+                        }
+                    });
+                }
+            } else {
+                message.innerHTML = '<span class="error">Подтвердите, что вы не робот, и правильно ответьте на вопрос.</span>';
+            }
+        });
 
-		
-	<div id="appRoot"></div>
-	
+        // Сохранить изменения
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (isAuthorized) {
+                publicContent.innerHTML = editArea.value;
+                message.innerHTML = '<span class="success">Контент обновлён!</span>';
+            }
+        });
 
-		<div class="only-print print-foot">Контур.Фокус &#169; АО &#171;ПФ &#171;СКБ Контур&#187;&nbsp;2025</div>
-	</div>
+        // Пуш-уведомление с точным временем для Воронежской области (UTC+3)
+        function sendVoronezhTimeNotification() {
+            const now = new Date();
+            // UTC+3 для Воронежа
+            const voronezhTime = new Date(now.getTime() + (3 - now.getTimezoneOffset() / 60) * 60 * 60 * 1000);
+            const hours = voronezhTime.getUTCHours().toString().padStart(2, '0');
+            const minutes = voronezhTime.getUTCMinutes().toString().padStart(2, '0');
+            const seconds = voronezhTime.getUTCSeconds().toString().padStart(2, '0');
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            new Notification("Время в Воронежской области", { body: `Сейчас ${timeString}` });
+        }
 
-	<input type="hidden" id="fbeta" value="0"/>
-	<input type="hidden" id="main-auth" value="demo2scoring"/>
-	<input type="hidden" id="ym-index" value="false"/>
-	<input type="hidden" id="ym-visor" value="true"/>
-	
-	<script src="/static/react/app.6cfd8c45c6bdb0132ec5.js"></script>
-	<div style="opacity: 0; font-family: 'Lab Grotesque'">
-		<span style="font-weight: normal"></span>
-		<span style="font-weight: normal; font-style: italic"></span>
-		<span style="font-weight: bold"></span>
-		<span style="font-weight: 500"></span>
-	</div>
+        // Запросить разрешение и запускать пуш-уведомления каждый час
+        function startVoronezhTimePushes() {
+            if (window.Notification && Notification.permission !== "denied") {
+                Notification.requestPermission().then(function(permission) {
+                    if (permission === "granted") {
+                        sendVoronezhTimeNotification();
+                        setInterval(sendVoronezhTimeNotification, 60 * 60 * 1000); // каждый час
+                    }
+                });
+            }
+        }
+
+        // Предложить посетителю включить пуш-уведомления времени
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (window.Notification && Notification.permission !== "granted") {
+                    if (confirm('Хотите получать пуш-уведомления с точным временем для Воронежской области каждый час?')) {
+                        startVoronezhTimePushes();
+                    }
+                } else if (window.Notification && Notification.permission === "granted") {
+                    startVoronezhTimePushes();
+                }
+            }, 2000);
+        });
+
+        document.getElementById('vk-btn').onclick = function() {
+            window.open('https://vk.com', '_blank');
+        };
+    </script>
 </body>
 </html>
+
+<!-- Копия сайта для автономной публикации на GitHub Pages -->
+<!-- Ссылка на оригинальный файл: vk-testers/ezstatvk-testers.html -->
